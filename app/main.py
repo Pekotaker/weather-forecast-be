@@ -69,7 +69,7 @@ async def print_time(threadName, delay):
     while True:
         time.sleep(delay)
         logger.info(f"{threadName}: {time.ctime(time.time())}")
-        requests.get("http://localhost:8000/subscription/sendMailDaily")
+        requests.get("http://127.0.0.1:8000/subscription/sendMailDaily")
 
 def between_callback(threadName, delay):
     asyncio.run(print_time(threadName, delay))
