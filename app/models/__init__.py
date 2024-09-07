@@ -1,0 +1,1 @@
+from app.models.weather_history import *
