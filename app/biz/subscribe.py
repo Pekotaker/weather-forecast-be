@@ -1,5 +1,6 @@
 from fastapi import Depends
 from app.databases.postgresql import get_db
+import os
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -62,6 +63,9 @@ async def subscribe(email: EmailStr, db_session: AsyncSession, request, city = N
             )
             db_session.add(stmt)
             await db_session.commit()
+            
+            backend_url = global_settings.backend_url
+            unsubscribe_link = f"https://{backend_url}/unsubscribe/{_id}" if backend_url else f"http://localhost:8000/unsubscribe/{_id}"
 
             # Send email
             message = """
@@ -69,11 +73,11 @@ async def subscribe(email: EmailStr, db_session: AsyncSession, request, city = N
             <body>
             <h2>Thank you for subscribing to our weather updates!</h2>
             <p>You will receive daily weather updates for your subscribed location.</p>
-            <p>To unsubscribe, click <a href="http://localhost:8000/subscription/unsubscribe/{}">here</a>.</p>
+            <p>To unsubscribe, click <a href="{}">here</a>.</p>
             <p>Regards,</p>
             </body>
             </html>
-            """.format(_id)
+            """.format(unsubscribe_link)
 
             EMAILS = EmailSchema(
                 email=[email],

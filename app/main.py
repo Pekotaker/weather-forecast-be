@@ -76,7 +76,7 @@ def between_callback(threadName, delay):
 
 # Create two threads as follows
 try:
-    _thread = threading.Thread(target=between_callback, args=("Daily mail sending", 86400))
+    _thread = threading.Thread(target=between_callback, args=("Daily mail sending", 60))
     _thread.start()
 except:
     print("Error: unable to start thread")

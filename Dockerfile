@@ -17,6 +17,4 @@ COPY ./app /app/app
 COPY ./logging_config.ini /app/logging_config.ini
 RUN touch ./debug.log
 RUN touch ./error.log
-COPY ./alembic /app/alembic
-COPY ./alembic.ini /app/alembic.ini
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
