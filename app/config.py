@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     days: int = 4
     url: str = "http://api.weatherapi.com/v1/forecast.json"
 
-    vercel_url: str = os.getenv("VERCEL_URL")
-    backend_url: str = vercel_url
+    vercel_url: str = os.getenv("VERCEL_URL", "http://localhost:8000")
+    backend_url: str = "https:// " + vercel_url if "localhost" not in vercel_url else vercel_url
     sql_host: str = os.getenv("SQL_HOST")
     sql_db: str = os.getenv("SQL_DB")
     sql_user: str = os.getenv("SQL_USER")

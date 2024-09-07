@@ -43,7 +43,7 @@ async def send_mail_daily(
     Send weather updates to all subscribers.
     """
     IP = request.client.host
-    if IP != "127.0.0.1":
-        return HTTPException(status_code=401, detail="Unauthorized access")
+    # if IP != "127.0.0.1":
+    #     return HTTPException(status_code=401, detail="Unauthorized access")
     result = await SubscribeBiz.send_mail_daily(db_session)
     return result
