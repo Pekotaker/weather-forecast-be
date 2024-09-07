@@ -72,7 +72,8 @@ async def print_time(threadName, delay):
     while True:
         time.sleep(delay)
         logger.info(f"{threadName}: {time.ctime(time.time())}")
-        url = global_settings.backend_url + "/subscription/sendMailDaily"
+        # url = global_settings.backend_url + "/subscription/sendMailDaily"
+        url = 'https://weather-forecast-be.vercel.app/subscription/sendMailDaily'
         requests.get(url)
 
 def between_callback(threadName, delay):
