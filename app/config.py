@@ -10,7 +10,7 @@ load_dotenv()
 
 class Settings(BaseSettings):
 
-    days: int = 4
+    days: int = 14
     url: str = "http://api.weatherapi.com/v1/forecast.json"
 
     render_url: str = os.getenv("RENDER_EXTERNAL_URL", "http://localhost:8000")

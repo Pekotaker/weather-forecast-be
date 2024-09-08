@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.weather_history import WeatherHistory
 from app.models.subscribed_emails import SubscribedEmails
 from app.utils.fetchData import fetchData
+from datetime import datetime, timedelta
 
 import logging
 
@@ -39,22 +40,12 @@ async def add_sample_data(db_session: AsyncSession):
 
         # Insert sample data
         data = response
-        current = WeatherHistory(
-            id=str(uuid.uuid4()),
-            day=0,
-            city=city,
-            temperature=data["current"]["temp_c"],
-            wind_speed=data["current"]["wind_kph"],
-            humidity=data["current"]["humidity"],
-            condition=data["current"]["condition"]["text"],
-            condition_icon=data["current"]["condition"]["icon"]
-        )
-        db_session.add(current)
-        i = 1
+        i = 0
         for item in data["forecast"]["forecastday"]:
             day = WeatherHistory(
                 id=str(uuid.uuid4()),
                 day=i,
+                date=datetime.strptime(item["date"], "%Y-%m-%d"),
                 city=city,
                 temperature=item["day"]["avgtemp_c"],
                 wind_speed=item["day"]["maxwind_kph"],
@@ -96,6 +87,9 @@ async def init_metadata(db_session: AsyncSession):
                 await add_sample_data(db_session)
             else:
                 logger.info("Table WeatherHistory already exists")
+
+        conn = await db_session.connection()  
+        if conn:
             checkEmailTable = await conn.run_sync(lambda sync_conn: sqlalchemy.inspect(sync_conn).has_table(SubscribedEmails.__tablename__))
             if not checkEmailTable:
                 logger.info("Creating table SubscribedEmails")
