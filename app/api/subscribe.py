@@ -23,6 +23,19 @@ async def subscribe(
     result = await SubscribeBiz.subscribe(email, db_session, request, city)
     return result
 
+@router.get("/confirmSubscription")
+async def confirm_subscription(
+    email: EmailStr,
+    request: Request,
+    city: str = None, 
+    db_session: AsyncSession = Depends(get_db)
+):
+    """
+    Confirm subscription for the given email.
+    """
+    result = await SubscribeBiz.confirm_subscription(email, db_session, request, city)
+    return result
+
 @router.get("/unsubscribe/{id}")
 async def unsubscribe(
     id: str,

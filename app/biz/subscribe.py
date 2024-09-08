@@ -38,9 +38,9 @@ async def get_subscribers(db_session: AsyncSession):
         logger.error(f"Error getting subscribers: {e}")
         raise e
 
-async def subscribe(email: EmailStr, db_session: AsyncSession, request, city = None):
+async def confirm_subscription(email: EmailStr, db_session: AsyncSession, request, city = None):
     """
-    Subscribe to weather updates for the given city.
+    Confirm subscription for the given email.
     """
     try:
         stmt = (
@@ -64,8 +64,8 @@ async def subscribe(email: EmailStr, db_session: AsyncSession, request, city = N
             db_session.add(stmt)
             await db_session.commit()
             
-            backend_url = global_settings.backend_url
-            unsubscribe_link = f"https://{backend_url}/unsubscribe/{_id}" if backend_url else f"http://localhost:8000/unsubscribe/{_id}"
+            backend_url = global_settings.backend_url                
+            unsubscribe_link = f"{backend_url}/subscription/unsubscribe/{_id}"
 
             # Send email
             message = """
@@ -89,6 +89,50 @@ async def subscribe(email: EmailStr, db_session: AsyncSession, request, city = N
         logger.error(f"Error subscribing: {e}")
         raise e
     
+
+async def subscribe(email: EmailStr, db_session: AsyncSession, request, city = None):
+    """
+    Subscribe to weather updates for the given city.
+    """
+    try:
+        stmt = (
+            select(SubscribedEmails)
+            .where(SubscribedEmails.email == email)
+        )
+        result = await db_session.execute(stmt)
+        result = result.scalars().all()
+        if result:
+            return "Email already subscribed"
+        else:
+            """
+            send email to confirm subscription
+            """
+
+            # Send email
+
+            subscribe_link = f"{global_settings.backend_url}/subscription/confirmSubscription?email={email}"
+            if city:
+                subscribe_link += f"&city={city}"
+
+            message = """
+            <html>
+            <body>
+            <h2>Thank you for subscribing to our weather updates!</h2>
+            <p>To confirm your subscription, click <a href="{}">here</a>.</p>
+            <p>Regards,</p>
+            </body>
+            </html>
+            """.format(subscribe_link)
+
+            EMAILS = EmailSchema(
+                email=[email],
+            )
+
+            await send_email(EMAILS, message)
+            return "Confirmation email sent"
+    except Exception as e:
+        logger.error(f"Error confirming subscription: {e}")
+        raise e
 
 async def unsubscribe(id: str, db_session: AsyncSession):
     """

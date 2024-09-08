@@ -13,8 +13,10 @@ class Settings(BaseSettings):
     days: int = 4
     url: str = "http://api.weatherapi.com/v1/forecast.json"
 
+    render_url: str = os.getenv("RENDER_EXTERNAL_URL", "http://localhost:8000")
     vercel_url: str = os.getenv("VERCEL_URL", "http://localhost:8000")
-    backend_url: str = "https:// " + vercel_url if "localhost" not in vercel_url else vercel_url
+    url_in_used: str = render_url if render_url != "http://localhost:8000" else "https://" + vercel_url
+    backend_url: str = url_in_used if "localhost" not in url_in_used else "http://localhost:8000"
     sql_host: str = os.getenv("SQL_HOST")
     sql_db: str = os.getenv("SQL_DB")
     sql_user: str = os.getenv("SQL_USER")
@@ -23,8 +25,6 @@ class Settings(BaseSettings):
     database_url: PostgresDsn = (
         f"postgresql+asyncpg://{sql_user}:{sql_pass}@{sql_host}/{sql_db}"
     )
-    jwt_algorithm: str = os.getenv("JWT_ALGORITHM")
-    jwt_expire: int = os.getenv("JWT_EXPIRE")
     api_key: str = os.getenv("API_KEY")
     
     #smtp config

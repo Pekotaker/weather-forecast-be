@@ -73,15 +73,17 @@ async def print_time(threadName, delay):
         time.sleep(delay)
         logger.info(f"{threadName}: {time.ctime(time.time())}")
         # url = global_settings.backend_url + "/subscription/sendMailDaily"
-        url = 'https://weather-forecast-be.vercel.app/subscription/sendMailDaily'
+        # url = 'https://weather-forecast-be.vercel.app/subscription/sendMailDaily'
+        url = 'http://localhost:8000/subscription/sendMailDaily' if "localhost" in global_settings.vercel_url else global_settings.backend_url + "/subscription/sendMailDaily"
         requests.get(url)
 
 def between_callback(threadName, delay):
     asyncio.run(print_time(threadName, delay))
 
-# Create two threads as follows
+# Create thread as follows
 try:
-    _thread = threading.Thread(target=between_callback, args=("Daily mail sending", 30))
+    seconds_in_a_day = 60 * 60 * 24
+    _thread = threading.Thread(target=between_callback, args=("Daily mail sending", seconds_in_a_day))
     _thread.start()
 except:
     print("Error: unable to start thread")
