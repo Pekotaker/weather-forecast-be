@@ -46,7 +46,7 @@ async def add_sample_data(db_session: AsyncSession):
                 id=str(uuid.uuid4()),
                 day=i,
                 date=datetime.strptime(item["date"], "%Y-%m-%d"),
-                city=city,
+                city=response["location"]["name"],
                 temperature=item["day"]["avgtemp_c"],
                 wind_speed=item["day"]["maxwind_kph"],
                 humidity=item["day"]["avghumidity"],

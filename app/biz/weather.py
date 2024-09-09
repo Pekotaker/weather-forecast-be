@@ -60,7 +60,7 @@ async def get_weather_history(city: str, db_session: AsyncSession):
                 day = WeatherHistory(
                     id=str(uuid.uuid4()),
                     day=i,
-                    city=city,
+                    city=response["location"]["name"],
                     date=datetime.strptime(item["date"], "%Y-%m-%d"),
                     temperature=item["day"]["avgtemp_c"],
                     wind_speed=item["day"]["maxwind_kph"],
@@ -79,6 +79,7 @@ async def get_weather_history(city: str, db_session: AsyncSession):
     
 async def get_current_location_weather(db_session: AsyncSession, request: Request):
     client_host = request.client.host
+    logger.info(f"Client host: {client_host}")
     try:
         stmt = (
             select(WeatherHistory)
@@ -123,7 +124,7 @@ async def get_current_location_weather(db_session: AsyncSession, request: Reques
                     id=str(uuid.uuid4()),
                     day=i,
                     date=datetime.strptime(item["date"], "%Y-%m-%d"),
-                    city=client_host,
+                    city=response["location"]["name"],
                     temperature=item["day"]["avgtemp_c"],
                     wind_speed=item["day"]["maxwind_kph"],
                     humidity=item["day"]["avghumidity"],
