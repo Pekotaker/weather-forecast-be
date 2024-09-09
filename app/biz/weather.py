@@ -56,6 +56,36 @@ async def get_weather_history(city: str, db_session: AsyncSession, request: Requ
             if response is None:
                 return "No data found"
             data = response
+
+            location = response["location"]["name"]
+            stmt = (
+                select(WeatherHistory)
+                .where(WeatherHistory.city == location)
+                .order_by(WeatherHistory.day.asc())
+            )
+            result = await db_session.execute(stmt)
+            result = result.scalars().all()
+
+            if len(result) > 0:
+                logger.info(result)
+                if result[0].date.date() == datetime.now().date():
+                    return result
+                else:
+                    # update the data
+                    logger.info("Outdated data, updating...")
+                    data = response
+                    i = 0
+                    for item in data["forecast"]["forecastday"]:
+                        result[i].date = datetime.strptime(item["date"], "%Y-%m-%d")
+                        result[i].temperature = item["day"]["avgtemp_c"]
+                        result[i].wind_speed = item["day"]["maxwind_kph"]
+                        result[i].humidity = item["day"]["avghumidity"]
+                        result[i].condition = item["day"]["condition"]["text"]
+                        result[i].condition_icon = item["day"]["condition"]["icon"]
+                        i += 1
+                    await db_session.commit()
+                    return result
+
             i = 0
             returnValue = []
             for item in data["forecast"]["forecastday"]:
