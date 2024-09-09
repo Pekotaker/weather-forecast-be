@@ -12,10 +12,12 @@ import uuid
 logger = logging.getLogger("full_info")
 global_settings = config.get_settings()
 
-async def get_weather_history(city: str, db_session: AsyncSession):
+async def get_weather_history(city: str, db_session: AsyncSession, request: Request):
     """
     Get the weather history for a specific city and day.
     """
+    client_host = request.client.host
+    logger.info(f"Client host: {client_host}")
     try:
         stmt = (
             select(WeatherHistory)

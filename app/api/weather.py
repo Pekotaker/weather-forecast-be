@@ -12,12 +12,13 @@ router = APIRouter(prefix="/weather", tags=["Weather"])
 @router.get("/getWeatherHistory")
 async def get_weather_history(
     city: str, 
+    request: Request,
     db_session: AsyncSession = Depends(get_db)
 ):
     """
     Get the weather forecast for the given city.
     """
-    result = await weatherBiz.get_weather_history(city, db_session)
+    result = await weatherBiz.get_weather_history(city, db_session, request)
     return result
 
 @router.get("/getCurrentLocationWeather")
